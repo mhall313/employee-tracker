@@ -1,7 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
-var figlet = require('figlet');
+const figlet = require('figlet');
+const Employee = require("./employee");
 
 // create the connection information for the sql database
 const connection = mysql.createConnection({
@@ -19,7 +20,7 @@ connection.connect(function(err) {
 });
 
 //Fun lil ascii art
-async function init(){
+function init(){
   figlet("Employee Tracker", function(err, data){
     if (err) throw err;
     console.log(data);
@@ -115,20 +116,38 @@ function viewAllbyMang (){
 }
 
 function addEmpl(){
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "firstName",
-        message: "What is the employee's first name?"
-      },
-      {
-        type: "input",
-        name: "lastName",
-        message: "What is the employee's last name?"
-      },
-
-    ])
+  connection.query("SELECT * FROM role", function(err,res){
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "firstName",
+          message: "What is the employee's first name?"
+        },
+        {
+          type: "input",
+          name: "lastName",
+          message: "What is the employee's last name?"
+        },
+        {
+          type: "list",
+          name: "role",
+          message: "What is this employee's role?",
+          choices: function() {
+            let choiceArray = [];
+            for(let i = 0; i < res.length; i++){
+              choiceArray.push(res[i].role);
+            }
+            return choiceArray;
+          }
+        },
+        {
+          type: "list",
+          role
+        }
+      ]) //inquirer end
+  }); //connect end
 }
 
 function removeEmpl(){
@@ -149,12 +168,21 @@ function removeEmpl(){
       }).then(function(answer){
         let chosenEmpl;
         for(let i = 0; i < res.length; i++){
-          if((res[i].first_name + " " + res[i].lastname) === answer.choice){
+          let fullName = (res[i].first_name + " " + res[i].last_name);
+          // console.log(fullName);
+          // console.log(answer.emplyDel);
+          if(fullName === answer.emplyDel){
             chosenEmpl = res[i];
-          }
-        }
-        console.log("this worked now add the mysql part");
-      })
+            connection.query("DELETE FROM employee WHERE first_name = ? AND last_name = ?",
+            [chosenEmpl.first_name, chosenEmpl.last_name],
+            function(err,res){
+              if (err) throw err;
+              console.log(chosenEmpl.first_name + " " + chosenEmpl.last_name+ " has been removed from the system.");
+            }); //connection to delete end
+          }; //if statement end
+        }// for loop end
+      start();
+    });//then end
   })
 }
 
@@ -162,9 +190,9 @@ function updateEmplRole(){
 
 }
 
-function updateEmplRole(){
+ function updateEmplMang(){
 
-}
+ }
 //ADDITION NEEDED: join to show department rather than department id
 function viewAllRoles(){
   connection.query(
