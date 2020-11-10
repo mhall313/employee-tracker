@@ -37,37 +37,37 @@ function start(){
   })
   .then(function(answer){
     switch(answer.startPrompt) {
-      case choices[0]:
+      case "View All Employees":
         viewAllEmpl();
         break;
-      case choices[1]:
+      case "View All Employees by Department":
         viewAllbyDept();
         break;
-      case choices[2]:
+      case "View All Employees by Manager":
         viewAllbyMang();
         break;
-      case choices[3]:
+      case "Add Employee":
         addEmpl();
         break;
-      case choices[4]:
+      case "Remove Employee":
         removeEmpl();
         break;
-      case choices[5]:
+      case "Update Employee Role":
         updateEmplRole();
         break;
-      case choices[6]:
+      case "Update Employee Manager":
         updateEmplMang();
         break;
-      case choices[7]:
+      case "View All Roles":
         viewAllRoles();
         break;
-      case choices[8]:
+      case "Add a Role":
         addRole();
         break;
-      case choices[9]:
+      case "Remove a Role":
         removeRole();
         break;
-      case choices[10]:
+      case "I'm done.":
         console.log("Thank you for using Employee Tracker.");
         return
       default:
