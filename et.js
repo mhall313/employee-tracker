@@ -78,7 +78,15 @@ function start(){
 }
 
 function viewAllEmpl(){
-
+  connection.query(
+    "SELECT * FROM employee", function (err, results){
+      if (err) throw err;
+      inquirer.prompt({
+          name:"allEmpl",
+          type: "",
+          message: ""
+        }).then(start());
+    });
 }
 
 function viewAllbyDept(){
