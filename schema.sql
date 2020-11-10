@@ -25,3 +25,23 @@ CREATE TABLE employee(
   manager_id INT,
   PRIMARY KEY (id)
 );
+
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES ("Melanie", "Hall", 100, NULL), 
+("Roberto", "Rubet", 100, NULL), 
+("Jon", "Deavers", 200, NULL), 
+("Jim", "Doyle", 200, NULL), 
+("Justin", "Psomething", 300, 6), 
+("Josh", "Allan", 301, NULL), 
+("Tanner", "Kirkpatrick", 401, NULL), 
+("Dylan", "Frank", 400, 7), 
+("Elisabeth", "Clumpkins", 100, NULL), 
+("Christine", "Moore", 100, NULL);
+
+INSERT INTO role (title, salary, department_id)
+VALUES ("Software Engineer", 80000, 100), 
+("Accountant", 50000, 200), 
+("Sales Person", 30000, 300), 
+("Sales Lead", 40000, 301), 
+("Legal Team Lead", 90000, 401), 
+("Lawyer", 100000, 400);

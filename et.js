@@ -1,8 +1,9 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+const cTable = require("console.table");
 
 // create the connection information for the sql database
-var connection = mysql.createConnection({
+const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
@@ -70,22 +71,26 @@ function start(){
       case "I'm done.":
         console.log("Thank you for using Employee Tracker.");
         return
-      default:
-        console.log("Please select an option.");
-        start();
     }
   });
 }
 
+//ADDITION NEEDED: need to add join and show manager rather than manager id
 function viewAllEmpl(){
   connection.query(
-    "SELECT * FROM employee", function (err, results){
+    "SELECT * FROM employee", function (err, res){
+      let employees = [];
       if (err) throw err;
-      inquirer.prompt({
-          name:"allEmpl",
-          type: "",
-          message: ""
-        }).then(start());
+      for (let i = 0; i < res.length; i++) {
+        employees.push({
+            "ID": res[i].id,
+            "First Name": res[i].first_name,
+            "Last Name": res[i].last_name,
+            "Role ID": res[i].role_id,
+            "Manager ID": res[i].manager_id
+          });
+      }
+      console.table(employees);
     });
 }
 
@@ -98,7 +103,19 @@ function viewAllbyMang (){
 }
 
 function addEmpl(){
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "firstName",
+      message: "What is the employee's first name?"
+    },
+    {
+      type: "input",
+      name: "lastName",
+      message: "What is the employee's last name?"
+    },
 
+  ])
 }
 
 function removeEmpl(){
