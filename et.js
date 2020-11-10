@@ -2,7 +2,7 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 const figlet = require('figlet');
-const Employee = require("./employee");
+const Employee = require("./future state/employee");
 
 // create the connection information for the sql database
 const connection = mysql.createConnection({
@@ -43,8 +43,10 @@ function start(){
         "Update Employee Role",
         "Update Employee Manager",
         "View All Roles",
-        "Add a Role",
-        "Remove a Role",
+        "Add Role",
+        "Remove Role",
+        "View All Departments",
+        "Add Department",
         "I'm done."
       ]
     })
@@ -74,11 +76,17 @@ function start(){
       case "View All Roles":
         viewAllRoles();
         break;
-      case "Add a Role":
+      case "Add Role":
         addRole();
         break;
-      case "Remove a Role":
+      case "Remove Role":
         removeRole();
+        break;
+      case "View All Department":
+        viewAllDept();
+        break;
+      case "Add Department":
+        addDept();
         break;
       case "I'm done.":
         console.log("Thank you for using Employee Tracker.");
@@ -131,24 +139,53 @@ function addEmpl(){
           message: "What is the employee's last name?"
         },
         {
-          type: "list",
+          type: "rawlist",
           name: "role",
           message: "What is this employee's role?",
           choices: function() {
             let choiceArray = [];
-            for(let i = 0; i < res.length; i++){
-              choiceArray.push(res[i].role);
-            }
-            return choiceArray;
+              for(let i = 0; i < res.length; i++){
+                choiceArray.push(res[i].title);
+              }
+              return choiceArray;
           }
-        },
-        {
-          type: "list",
-          role
         }
-      ]) //inquirer end
-  }); //connect end
-}
+      ]).then(function(answer){
+        let roleid = 0;
+        switch(answer.role){
+          case "Software Engineer":
+            roleid = 100;
+            break;
+          case "Accountant":
+            roleid = 200;
+            break;
+          case "Sales Person":
+            roleid = 300;
+            break;
+          case "Sales Lead":
+            roleid = 301;
+            break;
+          case "Legal Team Lead":
+            roleid = 401;
+            break;
+          case "Lawyer":
+            roleid = 400;
+            break;
+        }
+        connection.query("INSERT INTO employee SET?",
+        {
+          first_name: answer.firstName,
+          last_name: answer.lastName,
+          role_id: roleid,
+        },
+        function(err,res){
+          console.log(answer.firstName + " " + answer.lastName + " has been added.");
+          start();
+        }); //second connection end
+      }) // then end
+  }); //connection end
+} //function end
+        
 
 function removeEmpl(){
   connection.query("SELECT * FROM employee", function(err,res){
@@ -169,8 +206,6 @@ function removeEmpl(){
         let chosenEmpl;
         for(let i = 0; i < res.length; i++){
           let fullName = (res[i].first_name + " " + res[i].last_name);
-          // console.log(fullName);
-          // console.log(answer.emplyDel);
           if(fullName === answer.emplyDel){
             chosenEmpl = res[i];
             connection.query("DELETE FROM employee WHERE first_name = ? AND last_name = ?",
@@ -219,5 +254,13 @@ function addRole(){
 
 function removeRole(){
   
+}
+
+function viewAllDept(){
+
+}
+
+function addDept(){
+
 }
 
