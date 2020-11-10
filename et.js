@@ -1,6 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
+var figlet = require('figlet');
 
 // create the connection information for the sql database
 const connection = mysql.createConnection({
@@ -11,31 +12,41 @@ const connection = mysql.createConnection({
   database: "et_DB"
 });
 
-// connect to the mysql server and sql database
+//connect to the mysql server and sql database
 connection.connect(function(err) {
   if (err) throw err;
-  start();
+  init();
 });
 
+//Fun lil ascii art
+async function init(){
+  figlet("Employee Tracker", function(err, data){
+    if (err) throw err;
+    console.log(data);
+    start();
+  });
+}
+
 function start(){
-  inquirer.prompt({
-    name: "startPrompt",
-    type: "list",
-    message: "What would you like to do?",
-    choices: [
-      "View All Employees",
-      "View All Employees by Department",
-      "View All Employees by Manager",
-      "Add Employee",
-      "Remove Employee",
-      "Update Employee Role",
-      "Update Employee Manager",
-      "View All Roles",
-      "Add a Role",
-      "Remove a Role",
-      "I'm done."
-    ]
-  })
+  inquirer
+    .prompt({
+      name: "startPrompt",
+      type: "list",
+      message: "What would you like to do?",
+      choices: [
+        "View All Employees",
+        "View All Employees by Department",
+        "View All Employees by Manager",
+        "Add Employee",
+        "Remove Employee",
+        "Update Employee Role",
+        "Update Employee Manager",
+        "View All Roles",
+        "Add a Role",
+        "Remove a Role",
+        "I'm done."
+      ]
+    })
   .then(function(answer){
     switch(answer.startPrompt) {
       case "View All Employees":
@@ -91,6 +102,7 @@ function viewAllEmpl(){
           });
       }
       console.table(employees);
+      start();
     });
 }
 
@@ -103,23 +115,47 @@ function viewAllbyMang (){
 }
 
 function addEmpl(){
-  inquirer.prompt([
-    {
-      type: "input",
-      name: "firstName",
-      message: "What is the employee's first name?"
-    },
-    {
-      type: "input",
-      name: "lastName",
-      message: "What is the employee's last name?"
-    },
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "firstName",
+        message: "What is the employee's first name?"
+      },
+      {
+        type: "input",
+        name: "lastName",
+        message: "What is the employee's last name?"
+      },
 
-  ])
+    ])
 }
 
 function removeEmpl(){
-
+  connection.query("SELECT * FROM employee", function(err,res){
+    if (err) throw err;
+    inquirer
+      .prompt({
+        type: "rawlist",
+        name: "emplyDel",
+        message: "Which employee would you like to remove?",
+        choices: function() {
+          let choiceArray = [];
+          for(let i = 0; i < res.length; i++){
+            choiceArray.push(res[i].first_name + " " + res[i].last_name);
+          }
+          return choiceArray;
+      }
+      }).then(function(answer){
+        let chosenEmpl;
+        for(let i = 0; i < res.length; i++){
+          if((res[i].first_name + " " + res[i].lastname) === answer.choice){
+            chosenEmpl = res[i];
+          }
+        }
+        console.log("this worked now add the mysql part");
+      })
+  })
 }
 
 function updateEmplRole(){
@@ -129,8 +165,23 @@ function updateEmplRole(){
 function updateEmplRole(){
 
 }
-
+//ADDITION NEEDED: join to show department rather than department id
 function viewAllRoles(){
+  connection.query(
+    "SELECT * FROM role", function (err, res){
+      let roles = [];
+      if (err) throw err;
+      for (let i = 0; i < res.length; i++) {
+        roles.push({
+            "ID": res[i].id,
+            "Title": res[i].title,
+            "Salary": res[i].salary,
+            "Department ID": res[i].department_id
+          });
+      }
+      console.table(roles);
+      start();
+    });
 
 }
 
