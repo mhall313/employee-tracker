@@ -37,17 +37,17 @@ function start(){
       choices: [
         "View All Employees",
         "View All Employees by Department",
-        "View All Employees by Manager", //Bonus
+        "View All Employees by Manager", //Bonus done
         "Add Employee",
-        "Remove Employee", //Bonus
+        "Remove Employee", //Bonus done
         "Update Employee Role", //MVP needed
         "Update Employee Manager", //Bonus
         "View All Roles",
         "Add Role",
-        "Remove Role", //Bonus
+        "Remove Role", //Bonus done
         "View All Departments",
         "Add Department",
-        "Remove Department", //Bonus
+        "Remove Department", //Bonus done
         "View Total Utilized Budget", //Bonus
         "I'm done."
       ]
@@ -443,6 +443,16 @@ function removeDept(){
 
 //the combined salaries of all employees in that department
 function totalBudget(){
-
+  connection.query(
+    "SELECT employee.`id`, role.`salary`  FROM `employee` LEFT JOIN `role` ON employee.`role_id` = role.`id`",
+    function (err, res){
+      let totalBudget = 0;
+      if (err) throw err;
+      for (let i = 0; i < res.length; i++) {
+        totalBudget = totalBudget +  res[i].salary;
+      };
+      console.log("The total utilized budget for the current staff is $" + totalBudget +"." );
+      start();
+    });
 }
 
