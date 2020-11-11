@@ -330,6 +330,7 @@ function addRole(){
   }); //connection end
 }
 
+//Complete, except doesnt console log the message for some reason
 function removeRole(){
   connection.query("SELECT * FROM role", function(err,res){
     if (err) throw err;
@@ -350,10 +351,7 @@ function removeRole(){
         for(let i = 0; i < res.length; i++){
           if(res[i].title === answer.roleDel){
             chosenRole = res[i];
-            console.log(chosenRole);
-            connection.query("DELETE FROM role WHERE title = ?",
-            [chosenRole.title],
-            function(err,res){
+            connection.query("DELETE FROM role WHERE title = ?", [chosenRole.title], function(err,res){
               if (err) throw err;
               console.log(chosenRole.title + " has been removed from the system.");
             }); //connection to delete end
@@ -361,7 +359,7 @@ function removeRole(){
         }// for loop end
       start();
     });//then end
-  })
+  }) //original connection end
 }
 //Complete.. check readme for any missing details
 function viewAllDept(){
