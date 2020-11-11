@@ -2,7 +2,9 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 const figlet = require('figlet');
-const Employee = require("./future state/employee");
+
+//Development of classes and methods for common sql queries would be developed in a future state
+//const Employee = require("./future state/employee");
 
 // create the connection information for the sql database
 const connection = mysql.createConnection({
@@ -37,18 +39,18 @@ function start(){
       choices: [
         "View All Employees",
         "View All Employees by Department",
-        "View All Employees by Manager", //Bonus done
+        "View All Employees by Manager", 
         "Add Employee",
-        "Remove Employee", //Bonus done
-        "Update Employee Role", //MVP needed
+        "Remove Employee", 
+        "Update Employee Role",
         "Update Employee Manager", //Bonus
         "View All Roles",
         "Add Role",
-        "Remove Role", //Bonus done
+        "Remove Role", 
         "View All Departments",
         "Add Department",
-        "Remove Department", //Bonus done
-        "View Total Utilized Budget", //Bonus
+        "Remove Department", 
+        "View Total Utilized Budget",
         "I'm done."
       ]
     })
@@ -103,10 +105,10 @@ function start(){
   });
 }
 
-//ADDITION NEEDED: show manager rather than manager id?
+//ADDITION NEEDED: show manager rather than manager id in future state
 function viewAllEmpl(){
   connection.query(
-    "SELECT employee.`id`, employee.`first_name`, employee.`last_name`, employee.`manager_id`, role.`title`, role.`salary`, department.`dept_name`  FROM `employee` LEFT JOIN `role` ON employee.`role_id` = role.`id` LEFT JOIN `department` on role.`department_id` = department.`id`",
+    "SELECT employee.`id`, employee.`first_name`, employee.`last_name`, employee.`manager_id`, role.`title`, role.`salary`, department.`dept_name`  FROM `employee` LEFT JOIN `role` ON employee.`role_id` = role.`id` LEFT JOIN `department` on role.`department_id` = department.`id`", //rather than backtics would use question mark syntax for dynamic replacement
     function (err, res){
       let employees = [];
       if (err) throw err;
@@ -126,7 +128,7 @@ function viewAllEmpl(){
     });
 }
 
-//ADDITION NEEDED: show manager rather than manager id?
+//ADDITION NEEDED: show manager rather than manager id in future state
 function viewAllbyDept(){
   connection.query(
     "SELECT employee.`id`, employee.`first_name`, employee.`last_name`, employee.`manager_id`, role.`title`, role.`salary`, department.`dept_name`  FROM `employee` LEFT JOIN `role` ON employee.`role_id` = role.`id` LEFT JOIN `department` on role.`department_id` = department.`id` ORDER BY department.`dept_name` ASC",
@@ -149,7 +151,7 @@ function viewAllbyDept(){
     });
 }
 
-//ADDITION NEEDED: show manager rather than manager id?
+//ADDITION NEEDED: sshow manager rather than manager id in future state
 function viewAllbyMang (){
   connection.query(
     "SELECT employee.`id`, employee.`first_name`, employee.`last_name`, employee.`manager_id`, role.`title`, role.`salary`, department.`dept_name`  FROM `employee` LEFT JOIN `role` ON employee.`role_id` = role.`id` LEFT JOIN `department` on role.`department_id` = department.`id` ORDER BY employee.`manager_id` ASC",
@@ -172,7 +174,7 @@ function viewAllbyMang (){
     });
 }
 
-//ADDITION NEEDED: Add in add manager prompt?
+//ADDITION NEEDED: show manager rather than manager id in future state
 function addEmpl(){
   connection.query("SELECT * FROM role", function(err,res){
     if (err) throw err;
@@ -225,7 +227,6 @@ function addEmpl(){
   }); //connection end
 }
         
-//Complete
 function removeEmpl(){
   connection.query("SELECT * FROM employee", function(err,res){
     if (err) throw err;
@@ -251,8 +252,8 @@ function removeEmpl(){
             [chosenEmpl.first_name, chosenEmpl.last_name],
             function(err,res){
               if (err) throw err;
-              console.log(chosenEmpl.first_name + " " + chosenEmpl.last_name+ " has been removed from the system.");
             }); //connection to delete end
+            console.log(chosenEmpl.first_name + " " + chosenEmpl.last_name+ " has been removed from the system.");
           }; //if statement end
         }// for loop end
       start();
@@ -261,14 +262,69 @@ function removeEmpl(){
 }
 
 function updateEmplRole(){
+  connection.query("SELECT * FROM employee", function(err,res){
+    if (err) throw err;
+    let choiceArray = [];
+    for(let i = 0; i < res.length; i++){
+      choiceArray.push(res[i].first_name + " " + res[i].last_name);
+    }
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "emplyUpd",
+          message: "Which employee would you like to update?",
+          choices: choiceArray
+        },
+        {
+          type: "input",
+          name: "emplyRole",
+          message: "What is the employee's new role?"
+        }
+      ]).then(function(answer){
+        connection.query("SELECT * FROM role", function(err,res){
+          if (err) throw err;
+          //find role id from input
+          let roleid;
+          for(let i = 0; i < res.length; i++){
+            if(answer.emplyRole === res[i].title){
+              roleid = res[i].id;
+            }
+          }
+          //need to splice emplyUpd
+          let split = answer.emplyUpd.split(" ");
+          let firstName = split[0];
+          let lastName = split[1];
+              connection.query("UPDATE employee SET ? WHERE ? AND ?",
+              [ 
+                {
+                  role_id: roleid
+                },
+                {
+                  first_name: firstName
+                },
+                {
+                  last_name: lastName
+                }
+              ],
+              function(err, res) {
+                if (err) throw err;
+              }); //update connection end
+            }); //connection in then end
+        console.log(answer.emplyUpd + "'s role has been updated.");
+        start();
+      }); //then end
+    }); //initial connection end
+
+        
+}
+
+//Would include in future state
+function updateEmplMang(){
 
 }
 
- function updateEmplMang(){
 
- }
-
-//Complete
 function viewAllRoles(){
   connection.query(
     "SELECT role.`id`, role.`title`, role.`salary`, department.`dept_name`  FROM `role` LEFT JOIN `department` ON role.`department_id` = department.`id`"
@@ -289,7 +345,7 @@ function viewAllRoles(){
 
 }
 
-//Complete.
+
 function addRole(){
   connection.query("SELECT * FROM department", function(err,res){
     if (err) throw err;
@@ -338,7 +394,7 @@ function addRole(){
   }); //connection end
 }
 
-//Complete, except doesnt console log the message for some reason
+
 function removeRole(){
   connection.query("SELECT * FROM role", function(err,res){
     if (err) throw err;
@@ -361,15 +417,15 @@ function removeRole(){
             chosenRole = res[i];
             connection.query("DELETE FROM role WHERE title = ?", [chosenRole.title], function(err,res){
               if (err) throw err;
-              console.log(chosenRole.title + " has been removed from the system.");
             }); //connection to delete end
+            console.log(chosenRole.title + " has been removed from the system.");
           }; //if statement end
         }// for loop end
       start();
     });//then end
   }) //original connection end
 }
-//Complete
+
 function viewAllDept(){
   connection.query(
     "SELECT * FROM department", function (err, res){
@@ -386,7 +442,6 @@ function viewAllDept(){
     });
 }
 
-//Complete
 function addDept(){
     inquirer
       .prompt([
@@ -407,7 +462,6 @@ function addDept(){
       }) // then end
 }
 
-//complete besides the console log doesnt work again
 function removeDept(){
   connection.query("SELECT * FROM department", function(err,res){
     if (err) throw err;
@@ -432,8 +486,8 @@ function removeDept(){
             [chosenDept.dept_name],
             function(err,res){
               if (err) throw err;
-              console.log(chosenDept.dept_name+ " has been removed from the system.");
             }); //connection to delete end
+            console.log(chosenDept.dept_name+ " has been removed from the system.");
           }; //if statement end
         }// for loop end
       start();
@@ -441,7 +495,7 @@ function removeDept(){
   })
 }
 
-//the combined salaries of all employees in that department
+//Function to calculate the "total utilized budget" which in this example is the sum of salaries assuming everyone is hired on Jan 1 and no one leaves ...
 function totalBudget(){
   connection.query(
     "SELECT employee.`id`, role.`salary`  FROM `employee` LEFT JOIN `role` ON employee.`role_id` = role.`id`",
