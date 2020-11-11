@@ -19,7 +19,7 @@ connection.connect(function(err) {
   init();
 });
 
-//Fun lil ascii art
+//Fun lil ascii art in the beginning
 function init(){
   figlet("Employee Tracker", function(err, data){
     if (err) throw err;
@@ -27,7 +27,7 @@ function init(){
     start();
   });
 }
-
+//Main menu 
 function start(){
   inquirer
     .prompt({
@@ -82,7 +82,7 @@ function start(){
       case "Remove Role":
         removeRole();
         break;
-      case "View All Department":
+      case "View All Departments":
         viewAllDept();
         break;
       case "Add Department":
@@ -95,18 +95,21 @@ function start(){
   });
 }
 
-//ADDITION NEEDED: need to add join and show manager rather than manager id
+//ADDITION NEEDED: show manager rather than manager id?
 function viewAllEmpl(){
   connection.query(
-    "SELECT * FROM employee", function (err, res){
+    "SELECT employee.`id`, employee.`first_name`, employee.`last_name`, employee.`manager_id`, role.`title`, role.`salary`, department.`dept_name`  FROM `employee` LEFT JOIN `role` ON employee.`role_id` = role.`id` LEFT JOIN `department` on role.`department_id` = department.`id`",
+    function (err, res){
       let employees = [];
       if (err) throw err;
       for (let i = 0; i < res.length; i++) {
         employees.push({
-            "ID": res[i].id,
+            "Employee ID": res[i].id,
             "First Name": res[i].first_name,
             "Last Name": res[i].last_name,
-            "Role ID": res[i].role_id,
+            "Title": res[i].title,
+            "Salary": res[i].salary,
+            "Department": res[i].dept_name,
             "Manager ID": res[i].manager_id
           });
       }
@@ -115,14 +118,53 @@ function viewAllEmpl(){
     });
 }
 
+//ADDITION NEEDED: show manager rather than manager id?
 function viewAllbyDept(){
-
+  connection.query(
+    "SELECT employee.`id`, employee.`first_name`, employee.`last_name`, employee.`manager_id`, role.`title`, role.`salary`, department.`dept_name`  FROM `employee` LEFT JOIN `role` ON employee.`role_id` = role.`id` LEFT JOIN `department` on role.`department_id` = department.`id` ORDER BY department.`dept_name` ASC",
+    function (err, res){
+      let employees = [];
+      if (err) throw err;
+      for (let i = 0; i < res.length; i++) {
+        employees.push({
+            "Employee ID": res[i].id,
+            "First Name": res[i].first_name,
+            "Last Name": res[i].last_name,
+            "Title": res[i].title,
+            "Salary": res[i].salary,
+            "Department": res[i].dept_name,
+            "Manager ID": res[i].manager_id
+          });
+      }
+      console.table(employees);
+      start();
+    });
 }
 
+//ADDITION NEEDED: show manager rather than manager id?
 function viewAllbyMang (){
-
+  connection.query(
+    "SELECT employee.`id`, employee.`first_name`, employee.`last_name`, employee.`manager_id`, role.`title`, role.`salary`, department.`dept_name`  FROM `employee` LEFT JOIN `role` ON employee.`role_id` = role.`id` LEFT JOIN `department` on role.`department_id` = department.`id` ORDER BY employee.`manager_id` ASC",
+    function (err, res){
+      let employees = [];
+      if (err) throw err;
+      for (let i = 0; i < res.length; i++) {
+        employees.push({
+            "Employee ID": res[i].id,
+            "First Name": res[i].first_name,
+            "Last Name": res[i].last_name,
+            "Title": res[i].title,
+            "Salary": res[i].salary,
+            "Department": res[i].dept_name,
+            "Manager ID": res[i].manager_id
+          });
+      }
+      console.table(employees);
+      start();
+    });
 }
 
+//ADDITION NEEDED: change role to be a join find sitch with the role table
 function addEmpl(){
   connection.query("SELECT * FROM role", function(err,res){
     if (err) throw err;
@@ -186,7 +228,7 @@ function addEmpl(){
   }); //connection end
 } //function end
         
-
+//Complete I think ..
 function removeEmpl(){
   connection.query("SELECT * FROM employee", function(err,res){
     if (err) throw err;
@@ -228,18 +270,20 @@ function updateEmplRole(){
  function updateEmplMang(){
 
  }
-//ADDITION NEEDED: join to show department rather than department id
+
+//Complete I think ...
 function viewAllRoles(){
   connection.query(
-    "SELECT * FROM role", function (err, res){
+    "SELECT role.`id`, role.`title`, role.`salary`, department.`dept_name`  FROM `role` LEFT JOIN `department` ON role.`department_id` = department.`id`"
+    , function (err, res){
       let roles = [];
       if (err) throw err;
       for (let i = 0; i < res.length; i++) {
         roles.push({
-            "ID": res[i].id,
+            "Role ID": res[i].id,
             "Title": res[i].title,
             "Salary": res[i].salary,
-            "Department ID": res[i].department_id
+            "Department": res[i].dept_name
           });
       }
       console.table(roles);
@@ -255,9 +299,21 @@ function addRole(){
 function removeRole(){
   
 }
-
+//Complete I think ..
 function viewAllDept(){
-
+  connection.query(
+    "SELECT * FROM department", function (err, res){
+      let dept = [];
+      if (err) throw err;
+      for (let i = 0; i < res.length; i++) {
+        dept.push({
+            "Department ID": res[i].id,
+            "Department": res[i].dept_name
+          });
+      }
+      console.table(dept);
+      start();
+    });
 }
 
 function addDept(){

@@ -27,21 +27,27 @@ CREATE TABLE employee(
 );
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Melanie", "Hall", 100, NULL), 
-("Roberto", "Rubet", 100, NULL), 
-("Jon", "Deavers", 200, NULL), 
-("Jim", "Doyle", 200, NULL), 
-("Justin", "Psomething", 300, 6), 
-("Josh", "Allan", 301, NULL), 
-("Tanner", "Kirkpatrick", 401, NULL), 
-("Dylan", "Frank", 400, 7), 
-("Elisabeth", "Clumpkins", 100, NULL), 
-("Christine", "Moore", 100, NULL);
+VALUES ("Melanie", "Hall", 1, NULL), 
+("Roberto", "Rubet", 1, NULL), 
+("Jon", "Deavers", 2, NULL), 
+("Jim", "Doyle", 3, NULL), 
+("Justin", "Psomething", 3, 6), 
+("Josh", "Allan", 4, NULL), 
+("Tanner", "Kirkpatrick", 6, NULL), 
+("Dylan", "Frank", 5, 7), 
+("Elisabeth", "Clumpkins", 1, NULL), 
+("Christine", "Moore", 1, NULL);
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("Software Engineer", 80000, 100), 
-("Accountant", 50000, 200), 
-("Sales Person", 30000, 300), 
-("Sales Lead", 40000, 301), 
-("Legal Team Lead", 90000, 401), 
-("Lawyer", 100000, 400);
+VALUES ("Software Engineer", 80000, 2), 
+("Accountant", 50000, 4), 
+("Sales Person", 30000, 1), 
+("Sales Lead", 40000, 1), 
+("Legal Team Lead", 90000, 3), 
+("Lawyer", 100000, 3);
+
+INSERT INTO department (dept_name)
+VALUES ("Sales"),
+("Engineering"),
+("Legal"),
+("Finance");
