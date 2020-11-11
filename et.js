@@ -37,16 +37,18 @@ function start(){
       choices: [
         "View All Employees",
         "View All Employees by Department",
-        "View All Employees by Manager",
+        "View All Employees by Manager", //Bonus
         "Add Employee",
-        "Remove Employee",
-        "Update Employee Role",
-        "Update Employee Manager",
+        "Remove Employee", //Bonus
+        "Update Employee Role", //MVP needed
+        "Update Employee Manager", //Bonus
         "View All Roles",
         "Add Role",
-        "Remove Role",
+        "Remove Role", //Bonus
         "View All Departments",
         "Add Department",
+        "Remove Department", //Bonus
+        "View Total Utilized Budget", //Bonus
         "I'm done."
       ]
     })
@@ -87,6 +89,12 @@ function start(){
         break;
       case "Add Department":
         addDept();
+        break;
+      case "Remove Department":
+        removeDept();
+        break;
+      case "View Total Utilized Budget":
+        totalBudget();
         break;
       case "I'm done.":
         console.log("Thank you for using Employee Tracker.");
@@ -215,9 +223,9 @@ function addEmpl(){
         
       }) // then end
   }); //connection end
-} //function end
+}
         
-//Complete.. check readme for any missing details
+//Complete
 function removeEmpl(){
   connection.query("SELECT * FROM employee", function(err,res){
     if (err) throw err;
@@ -260,7 +268,7 @@ function updateEmplRole(){
 
  }
 
-//Complete... check readme for any missing details
+//Complete
 function viewAllRoles(){
   connection.query(
     "SELECT role.`id`, role.`title`, role.`salary`, department.`dept_name`  FROM `role` LEFT JOIN `department` ON role.`department_id` = department.`id`"
@@ -281,7 +289,7 @@ function viewAllRoles(){
 
 }
 
-//Complete.. check readme for any missing details
+//Complete.
 function addRole(){
   connection.query("SELECT * FROM department", function(err,res){
     if (err) throw err;
@@ -361,7 +369,7 @@ function removeRole(){
     });//then end
   }) //original connection end
 }
-//Complete.. check readme for any missing details
+//Complete
 function viewAllDept(){
   connection.query(
     "SELECT * FROM department", function (err, res){
@@ -397,5 +405,44 @@ function addDept(){
             start();
           }); //connection end  
       }) // then end
+}
+
+//complete besides the console log doesnt work again
+function removeDept(){
+  connection.query("SELECT * FROM department", function(err,res){
+    if (err) throw err;
+    inquirer
+      .prompt({
+        type: "rawlist",
+        name: "deptDel",
+        message: "Which department would you like to remove?",
+        choices: function() {
+          let choiceArray = [];
+          for(let i = 0; i < res.length; i++){
+            choiceArray.push(res[i].dept_name);
+          }
+          return choiceArray;
+      }
+      }).then(function(answer){
+        let chosenDept;
+        for(let i = 0; i < res.length; i++){
+          if(res[i].dept_name === answer.deptDel){
+            chosenDept = res[i];
+            connection.query("DELETE FROM department WHERE dept_name = ?",
+            [chosenDept.dept_name],
+            function(err,res){
+              if (err) throw err;
+              console.log(chosenDept.dept_name+ " has been removed from the system.");
+            }); //connection to delete end
+          }; //if statement end
+        }// for loop end
+      start();
+    });//then end
+  })
+}
+
+//the combined salaries of all employees in that department
+function totalBudget(){
+
 }
 
