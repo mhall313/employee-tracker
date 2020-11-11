@@ -164,7 +164,7 @@ function viewAllbyMang (){
     });
 }
 
-//ADDITION NEEDED: change role to be a join find sitch with the role table
+//ADDITION NEEDED: Add in add manager prompt?
 function addEmpl(){
   connection.query("SELECT * FROM role", function(err,res){
     if (err) throw err;
@@ -193,42 +193,31 @@ function addEmpl(){
           }
         }
       ]).then(function(answer){
-        let roleid = 0;
-        switch(answer.role){
-          case "Software Engineer":
-            roleid = 100;
-            break;
-          case "Accountant":
-            roleid = 200;
-            break;
-          case "Sales Person":
-            roleid = 300;
-            break;
-          case "Sales Lead":
-            roleid = 301;
-            break;
-          case "Legal Team Lead":
-            roleid = 401;
-            break;
-          case "Lawyer":
-            roleid = 400;
-            break;
-        }
-        connection.query("INSERT INTO employee SET?",
-        {
-          first_name: answer.firstName,
-          last_name: answer.lastName,
-          role_id: roleid,
-        },
-        function(err,res){
-          console.log(answer.firstName + " " + answer.lastName + " has been added.");
-          start();
-        }); //second connection end
+        connection.query("SELECT * FROM role", function(err,res){
+          let roleid = 0;
+          if (err) throw err;
+          for (let i = 0; i < res.length; i++) {
+            if(answer.role === res[i].title){
+              roleid = res[i].id;
+            }
+          }
+          connection.query("INSERT INTO employee SET?",
+          {
+            first_name: answer.firstName,
+            last_name: answer.lastName,
+            role_id: roleid,
+          },
+          function(err,res){
+            console.log(answer.firstName + " " + answer.lastName + " has been added.");
+            start();
+          }); //nested connection end
+        });//second connection end
+        
       }) // then end
   }); //connection end
 } //function end
         
-//Complete I think ..
+//Complete.. check readme for any missing details
 function removeEmpl(){
   connection.query("SELECT * FROM employee", function(err,res){
     if (err) throw err;
@@ -271,7 +260,7 @@ function updateEmplRole(){
 
  }
 
-//Complete I think ...
+//Complete... check readme for any missing details
 function viewAllRoles(){
   connection.query(
     "SELECT role.`id`, role.`title`, role.`salary`, department.`dept_name`  FROM `role` LEFT JOIN `department` ON role.`department_id` = department.`id`"
@@ -292,14 +281,89 @@ function viewAllRoles(){
 
 }
 
+//Complete.. check readme for any missing details
 function addRole(){
-
+  connection.query("SELECT * FROM department", function(err,res){
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "title",
+          message: "What is the role title?"
+        },
+        {
+          type: "input",
+          name: "salary",
+          message: "What is the salary for this role?"
+        },
+        {
+          type: "rawlist",
+          name: "dept",
+          message: "What idepartment does this role fall in?",
+          choices: function() {
+            let choiceArray = [];
+              for(let i = 0; i < res.length; i++){
+                choiceArray.push(res[i].dept_name);
+              }
+              return choiceArray;
+          }
+        }
+      ]).then(function(answer){
+          let deptid = 0;
+          for (let i = 0; i < res.length; i++) {
+            if(answer.dept === res[i].dept_name){
+              deptid = res[i].id;
+            }
+          }
+          connection.query("INSERT INTO role SET?",
+          {
+            title: answer.title,
+            salary: answer.salary,
+            department_id: deptid,
+          },
+          function(err,res){
+            console.log(answer.title + " has been added.");
+            start();
+          }); //second connection end  
+      }) // then end
+  }); //connection end
 }
 
 function removeRole(){
-  
+  connection.query("SELECT * FROM role", function(err,res){
+    if (err) throw err;
+    inquirer
+      .prompt({
+        type: "rawlist",
+        name: "roleDel",
+        message: "Which role would you like to remove?",
+        choices: function() {
+          let choiceArray = [];
+          for(let i = 0; i < res.length; i++){
+            choiceArray.push(res[i].title);
+          }
+          return choiceArray;
+      }
+      }).then(function(answer){
+        let chosenRole;
+        for(let i = 0; i < res.length; i++){
+          if(res[i].title === answer.roleDel){
+            chosenRole = res[i];
+            console.log(chosenRole);
+            connection.query("DELETE FROM role WHERE title = ?",
+            [chosenRole.title],
+            function(err,res){
+              if (err) throw err;
+              console.log(chosenRole.title + " has been removed from the system.");
+            }); //connection to delete end
+          }; //if statement end
+        }// for loop end
+      start();
+    });//then end
+  })
 }
-//Complete I think ..
+//Complete.. check readme for any missing details
 function viewAllDept(){
   connection.query(
     "SELECT * FROM department", function (err, res){
@@ -316,7 +380,24 @@ function viewAllDept(){
     });
 }
 
+//Complete
 function addDept(){
-
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "deptName",
+          message: "What is the name of the Department?"
+        },
+      ]).then(function(answer){
+          connection.query("INSERT INTO department SET?",
+          {
+            dept_name: answer.deptName
+          },
+          function(err,res){
+            console.log(answer.deptName + " has been added.");
+            start();
+          }); //connection end  
+      }) // then end
 }
 
